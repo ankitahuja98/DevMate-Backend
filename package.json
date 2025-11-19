@@ -1,0 +1,26 @@
+{
+  "name": "devmate",
+  "version": "1.0.0",
+  "description": "DevMate is a full-stack MERN application that connects developers based on their tech interests — like Tinder, but for coders. Users can swipe to match with other developers, chat in real time, and collaborate on projects or discuss modern technologies.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "DevMate:",
+    "Full",
+    "Stack",
+    "Mern",
+    "Stack"
+  ],
+  "author": "Ankit Ahuja",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.3",
+    "validator": "^13.15.23"
+  }
+}
