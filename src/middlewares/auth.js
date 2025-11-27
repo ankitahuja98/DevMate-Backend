@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// userAuth is a middleware to check the user jwt token and veriy user is authenticated or not.
+// userAuth is a middleware to check the user jwt token and veriy a user is authenticated or not.
 const userAuth = async (req, res, next) => {
   try {
     const { token } = req.cookies;
@@ -19,13 +19,13 @@ const userAuth = async (req, res, next) => {
     } else {
       return res.status(500).json({
         success: false,
-        message: "Something wentt wrong",
+        message: "Something went wrong",
       });
     }
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Something wenttt wrong",
+      message: "Something went wrong",
     });
   }
 };
