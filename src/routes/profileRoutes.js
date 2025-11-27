@@ -3,10 +3,14 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 
 const express = require("express");
+const {
+  validateEditProfileData,
+  validateForgetpasswordData,
+} = require("../../utils/validation");
 const profileRouter = express.Router();
 
 // get profile
-profileRouter.get("/getProfile", userAuth, async (req, res) => {
+profileRouter.get("/profile/view", userAuth, async (req, res) => {
   //   #swagger.tags = ["Profile"];
   //   #swagger.summary = "Get user profile";
   //   #swagger.description = "This endpoint get a user profile data.";
@@ -15,7 +19,7 @@ profileRouter.get("/getProfile", userAuth, async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Data...",
+      message: "Fetched user data successfully",
       data: user,
     });
   } catch (error) {
@@ -34,19 +38,7 @@ profileRouter.patch("/forgetPassword", async (req, res) => {
   try {
     let { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid Credentials",
-      });
-    }
-
-    if (password.length < 4) {
-      return res.status(400).json({
-        success: false,
-        message: "Password should contains more than 4 characters",
-      });
-    }
+    validateForgetpasswordData(res, req);
 
     const user = await User.findOne({ email });
 
@@ -76,34 +68,30 @@ profileRouter.patch("/forgetPassword", async (req, res) => {
 });
 
 // edit profile
-profileRouter.patch("/editProfile", userAuth, async (req, res) => {
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   //   #swagger.tags = ["Profile"];
   //   #swagger.summary = "Edit profile";
   //   #swagger.description = "This endpoint is used for edit the user data.";
   try {
     const user = req.user;
-    const { _id } = user;
-    let { name, age, password } = req.body;
 
-    let passwordHash;
-    if (password) {
-      passwordHash = await bcrypt.hash(password, 10);
+    if (!validateEditProfileData(req)) {
+      return res.status(400).json({
+        success: false,
+        message: "Something went wrong",
+      });
     }
 
-    await User.findOneAndUpdate(
-      { _id },
-      {
-        name: name || user.name,
-        age: age || user.age,
-        password: passwordHash || user.password,
-      },
-      { new: true, runValidators: true, validateModifiedOnly: true }
-    );
+    Object.keys(req.body).forEach((key) => (user[key] = req.body[key]));
+
+    await user.save();
+
     return res.status(200).json({
       success: true,
       message: "Your profile has been updated sucessfully",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       success: false,
       message: "Something went wrong",
