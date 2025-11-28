@@ -187,6 +187,74 @@
           }
         }
       }
+    },
+    "/connectionReq/send/{status}/{toUserId}": {
+      "post": {
+        "tags": [
+          "Connection Request"
+        ],
+        "summary": "send a connection request",
+        "description": "This endpoint send a connection request either interested or ignored.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toUserId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/connectionReq/review/{status}/{toUserId}": {
+      "post": {
+        "tags": [
+          "Connection Request"
+        ],
+        "summary": "review a connection request",
+        "description": "This endpoint review a connection request either accepted or rejected.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toUserId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
     }
   }
 }

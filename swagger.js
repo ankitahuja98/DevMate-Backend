@@ -8,6 +8,10 @@ const doc = {
 };
 
 const outputFile = "./swagger-output.json";
-const routes = ["./src/routes/authRoutes.js", "./src/routes/profileRoutes.js"];
+const routes = [
+  "./src/routes/authRoutes.js",
+  "./src/routes/profileRoutes.js",
+  "./src/routes/connectionReqRoutes.js",
+];
 
 swaggerAutogen(outputFile, routes, doc);

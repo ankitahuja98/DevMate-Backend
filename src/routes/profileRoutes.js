@@ -38,7 +38,9 @@ profileRouter.patch("/forgetPassword", async (req, res) => {
   try {
     let { email, password } = req.body;
 
-    validateForgetpasswordData(res, req);
+    await validateForgetpasswordData(req, res);
+
+    if (res.headersSent) return; //  STOP HERE if validation already sent error response
 
     const user = await User.findOne({ email });
 

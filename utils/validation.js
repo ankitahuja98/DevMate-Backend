@@ -1,4 +1,7 @@
-export function validateEditProfileData(req) {
+const ConnectionRequest = require("../src/models/connectionRequest");
+const User = require("../src/models/user");
+
+function validateEditProfileData(req) {
   const allowedProps = ["name", "age"];
 
   const isValid = Object.keys(req.body).every((val) =>
@@ -7,7 +10,7 @@ export function validateEditProfileData(req) {
   return isValid;
 }
 
-export function validateForgetpasswordData(res, req) {
+function validateForgetpasswordData(req, res) {
   const allowedProps = ["email", "password"];
 
   const isValid = Object.keys(req.body).every((val) =>
@@ -36,4 +39,57 @@ export function validateForgetpasswordData(res, req) {
       message: "Password should contains more than 4 characters",
     });
   }
+
+  return true;
 }
+
+async function validationConnectionReqSend(req, res) {
+  const { toUserId, status } = req.params;
+  const fromUserId = req.user._id;
+  const allowedStatus = ["interested", "ignored"];
+
+  const isValidStatus = allowedStatus.includes(status);
+
+  if (!isValidStatus) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Status Type",
+    });
+  }
+
+  const user = await User.findById(toUserId);
+
+  if (!user) {
+    return res.status(400).json({
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  const alreadySentReq = await ConnectionRequest.findOne({
+    fromUserId,
+    toUserId,
+  });
+
+  if (alreadySentReq) {
+    return res.status(400).json({
+      success: false,
+      message: "Already sent a request to this user",
+    });
+  }
+
+  if (toUserId == fromUserId) {
+    return res.status(400).json({
+      success: false,
+      message: "You are not allowed to send the request to yourself",
+    });
+  }
+
+  return true;
+}
+
+module.exports = {
+  validateEditProfileData,
+  validateForgetpasswordData,
+  validationConnectionReqSend,
+};
