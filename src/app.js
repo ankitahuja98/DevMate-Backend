@@ -27,10 +27,12 @@ app.use(
 const authRouter = require("./routes/authRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const connectionReqRouter = require("./routes/connectionReqRoutes");
+const userRouter = require("./routes/userRoutes");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", connectionReqRouter);
+app.use("/", userRouter);
 
 // Connect with DB and start the server
 connectDB()

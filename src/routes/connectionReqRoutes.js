@@ -4,7 +4,11 @@ const connectionReqRouter = express.Router();
 
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
-const { validationConnectionReqSend } = require("../../utils/validation");
+const {
+  validationConnectionReqSend,
+  validationConnectionReqReview,
+} = require("../../utils/validation");
+const { Connection } = require("mongoose");
 
 // Send Connection request
 connectionReqRouter.post(
@@ -46,22 +50,34 @@ connectionReqRouter.post(
 
 // Review Connection request
 connectionReqRouter.post(
-  "/connectionReq/review/:status/:toUserId",
+  "/connectionReq/review/:status/:requestId",
   userAuth,
   async (req, res) => {
     //   #swagger.tags = ["Connection Request"];
     //   #swagger.summary = "review a connection request";
     //   #swagger.description = "This endpoint review a connection request either accepted or rejected.";
     try {
-      const fromUserId = req.user._id;
-      const toUserId = req.params.toUserId;
-      const status = req.params.status;
+      await validationConnectionReqReview(req, res);
 
-      const connectionReq = new ConnectionRequest({
-        fromUserId,
-        toUserId,
-        status,
+      if (res.headersSent) return;
+
+      const loggedInUserId = req.user._id;
+      const { status, requestId } = req.params;
+
+      const connectionReq = await ConnectionRequest.findOne({
+        _id: requestId,
+        status: "interested",
+        toUserId: loggedInUserId,
       });
+
+      if (!connectionReq) {
+        return res.status(400).json({
+          success: false,
+          message: "Connection request not found",
+        });
+      }
+
+      connectionReq.status = status;
 
       await connectionReq.save();
 
@@ -70,7 +86,7 @@ connectionReqRouter.post(
         message: "Connection review completed",
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "Connection request review failed",
       });

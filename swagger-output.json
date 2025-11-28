@@ -213,6 +213,9 @@
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -222,7 +225,7 @@
         }
       }
     },
-    "/connectionReq/review/{status}/{toUserId}": {
+    "/connectionReq/review/{status}/{requestId}": {
       "post": {
         "tags": [
           "Connection Request"
@@ -237,7 +240,7 @@
             "type": "string"
           },
           {
-            "name": "toUserId",
+            "name": "requestId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -246,6 +249,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"

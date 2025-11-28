@@ -88,8 +88,23 @@ async function validationConnectionReqSend(req, res) {
   return true;
 }
 
+async function validationConnectionReqReview(req, res) {
+  const { requestId, status } = req.params;
+  const allowedStatus = ["accepted", "rejected"];
+
+  const isValidStatus = allowedStatus.includes(status);
+
+  if (!isValidStatus) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Status Type",
+    });
+  }
+}
+
 module.exports = {
   validateEditProfileData,
   validateForgetpasswordData,
   validationConnectionReqSend,
+  validationConnectionReqReview,
 };
