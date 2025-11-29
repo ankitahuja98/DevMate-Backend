@@ -11,7 +11,7 @@
     "http"
   ],
   "paths": {
-    "/signup": {
+    "/auth/signup": {
       "post": {
         "tags": [
           "Auth"
@@ -54,7 +54,7 @@
         }
       }
     },
-    "/login": {
+    "/auth/login": {
       "post": {
         "tags": [
           "Auth"
@@ -91,7 +91,7 @@
         }
       }
     },
-    "/logout": {
+    "/auth/logout": {
       "post": {
         "tags": [
           "Auth"
@@ -128,7 +128,7 @@
         }
       }
     },
-    "/forgetPassword": {
+    "/profile/forgetPassword": {
       "patch": {
         "tags": [
           "Profile"

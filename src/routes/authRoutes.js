@@ -5,7 +5,7 @@ const express = require("express");
 const authRouter = express.Router();
 
 //  User Signup
-authRouter.post("/signup", async (req, res) => {
+authRouter.post("/auth/signup", async (req, res) => {
   //   #swagger.tags = ["Auth"];
   //   #swagger.summary = "Register a new user";
   //   #swagger.description = "This endpoint registers a new user and returns a JWT token.";
@@ -40,7 +40,7 @@ authRouter.post("/signup", async (req, res) => {
 });
 
 // user login
-authRouter.post("/login", async (req, res) => {
+authRouter.post("/auth/login", async (req, res) => {
   //   #swagger.tags = ["Auth"];
   //   #swagger.summary = "Login a user";
   //   #swagger.description = "This endpoint logs in a user and returns a token in cookie.";
@@ -81,7 +81,7 @@ authRouter.post("/login", async (req, res) => {
 });
 
 //user logout
-authRouter.post("/logout", async (req, res) => {
+authRouter.post("/auth/logout", async (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'User logout'
   // #swagger.description = 'This endpoint logs out a user by clearing the cookie.'

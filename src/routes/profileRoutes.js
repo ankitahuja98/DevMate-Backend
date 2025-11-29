@@ -31,7 +31,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 });
 
 // Forget Password
-profileRouter.patch("/forgetPassword", async (req, res) => {
+profileRouter.patch("/profile/forgetPassword", async (req, res) => {
   //   #swagger.tags = ["Profile"];
   //   #swagger.summary = "Forget Password";
   //   #swagger.description = "This endpoint is used for forget the password.";
