@@ -12,6 +12,7 @@ const routes = [
   "./src/routes/authRoutes.js",
   "./src/routes/profileRoutes.js",
   "./src/routes/connectionReqRoutes.js",
+  "./src/routes/userRoutes.js",
 ];
 
 swaggerAutogen(outputFile, routes, doc);
