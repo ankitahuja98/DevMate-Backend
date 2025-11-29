@@ -6,10 +6,10 @@ const userRouter = express.Router();
 
 // Get Connection Request
 userRouter.get("/user/requests", userAuth, async (req, res) => {
+  //   #swagger.tags = ["User"];
+  //   #swagger.summary = "Get Connection Request";
+  //   #swagger.description = "This endpoint is used for get connection request";
   try {
-    //   #swagger.tags = ["User"];
-    //   #swagger.summary = "Get Connection Request";
-    //   #swagger.description = "This endpoint is used for get connection request";
     const loggedInUserId = req.user._id;
 
     const requests = await ConnectionRequest.find({
@@ -31,19 +31,26 @@ userRouter.get("/user/requests", userAuth, async (req, res) => {
 
 // Get Matches
 userRouter.get("/user/matches", userAuth, async (req, res) => {
+  //   #swagger.tags = ["User"];
+  //   #swagger.summary = "Get Matches;
+  //   #swagger.description = "This endpoint is used for get matches";
   try {
     const loggedInUserId = req.user._id;
 
-    const matches = await ConnectionRequest.find({
+    const connections = await ConnectionRequest.find({
       status: "accepted",
       $or: [{ fromUserId: loggedInUserId }, { toUserId: loggedInUserId }],
     })
       .populate("fromUserId", "name age")
       .populate("toUserId", "name age");
 
-    //   #swagger.tags = ["User"];
-    //   #swagger.summary = "Get Matches;
-    //   #swagger.description = "This endpoint is used for get matches";
+    const matches = connections.map((val) => {
+      if (val.fromUserId._id.toString() === loggedInUserId.toString()) {
+        return val.toUserId;
+      } else if (val.toUserId._id.toString() === loggedInUserId.toString()) {
+        return val.fromUserId;
+      }
+    });
 
     return res.status(200).json({
       success: true,
