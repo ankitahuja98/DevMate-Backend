@@ -45,11 +45,9 @@ userRouter.get("/user/matches", userAuth, async (req, res) => {
       .populate("toUserId", "name age");
 
     const matches = connections.map((val) => {
-      if (val.fromUserId._id.toString() === loggedInUserId.toString()) {
-        return val.toUserId;
-      } else if (val.toUserId._id.toString() === loggedInUserId.toString()) {
-        return val.fromUserId;
-      }
+      return val.fromUserId._id.toString() === loggedInUserId.toString()
+        ? val.toUserId
+        : val.fromUserId;
     });
 
     return res.status(200).json({
