@@ -2,7 +2,22 @@ const ConnectionRequest = require("../src/models/connectionRequest");
 const User = require("../src/models/user");
 
 function validateEditProfileData(req) {
-  const allowedProps = ["name", "age"];
+  const allowedProps = [
+    "name",
+    "age",
+    "profilePhoto",
+    "tagline",
+    "bio",
+    "location",
+    "currentRole",
+    "experience",
+    "lookingForTitle",
+    "lookingForDesc",
+    "availability",
+    "techStack",
+    "projects",
+    "socialLinks",
+  ];
 
   const isValid = Object.keys(req.body).every((val) =>
     allowedProps.includes(val)

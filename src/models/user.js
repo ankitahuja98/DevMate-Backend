@@ -40,7 +40,54 @@ const userSchema = new mongoose.Schema(
       minlength: 4,
       maxlength: 200,
     },
+
+    profilePhoto: { type: String, default: "" },
+    tagline: { type: String, maxLength: 100 },
+    bio: { type: String, maxLength: 500 },
+    location: { type: String },
+
+    currentRole: { type: String },
+    experience: {
+      type: Number,
+    },
+    lookingForTitle: {
+      type: String,
+      enum: [
+        "cofounder",
+        "collaborator",
+        "mentor",
+        "team-member",
+        "freelance-partner",
+      ],
+    },
+    lookingForDesc: {
+      type: String,
+      maxlength: 500,
+    },
+    availability: {
+      type: String,
+      enum: ["full-time", "part-time", "weekends", "flexible"],
+    },
+    techStack: {
+      type: [String],
+    },
+    projects: [
+      {
+        title: String,
+        description: String,
+        techUsed: [String],
+        role: String,
+        githubUrl: String,
+        liveUrl: String,
+      },
+    ],
+    socialLinks: {
+      github: String,
+      linkedin: String,
+      portfolio: String,
+    },
   },
+
   { timestamps: true }
 );
 

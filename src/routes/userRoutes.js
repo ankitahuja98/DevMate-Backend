@@ -7,9 +7,9 @@ const userRouter = express.Router();
 
 // Get Connection Request
 userRouter.get("/user/requests", userAuth, async (req, res) => {
-  //   #swagger.tags = ["User"];
-  //   #swagger.summary = "Get Connection Request";
-  //   #swagger.description = "This endpoint is used for get connection request";
+  //   #swagger.tags = ["User"]
+  //   #swagger.summary = "Get Connection Request"
+  //   #swagger.description = "This endpoint is used for get connection request"
   try {
     const loggedInUserId = req.user._id;
 
@@ -32,9 +32,9 @@ userRouter.get("/user/requests", userAuth, async (req, res) => {
 
 // Get Matches
 userRouter.get("/user/matches", userAuth, async (req, res) => {
-  //   #swagger.tags = ["User"];
-  //   #swagger.summary = "Get Matches;
-  //   #swagger.description = "This endpoint is used for get matches";
+  //   #swagger.tags = ["User"]
+  //   #swagger.summary = "Get Matches
+  //   #swagger.description = "This endpoint is used for get matches"
   try {
     const loggedInUserId = req.user._id;
 
@@ -66,7 +66,7 @@ userRouter.get("/user/matches", userAuth, async (req, res) => {
 // Get all user -- feed API
 userRouter.get("/feed", userAuth, async (req, res) => {
   //   #swagger.tags = ["User"];
-  //   #swagger.summary = "Get Feed;
+  //   #swagger.summary = "Get Feed
   //   #swagger.description = "This endpoint is used for get feed, all the other user profile";
   try {
     const loggedInUserId = req.user._id;

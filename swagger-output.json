@@ -287,8 +287,28 @@
         "tags": [
           "User"
         ],
-        "summary": "Get Matches;",
+        "summary": "Get Matches",
         "description": "This endpoint is used for get matches",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/feed": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get Feed",
+        "description": "This endpoint is used for get feed, all the other user profile",
         "responses": {
           "200": {
             "description": "OK"
