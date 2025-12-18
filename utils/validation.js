@@ -18,6 +18,7 @@ function validateEditProfileData(req) {
     "techStack",
     "projects",
     "socialLinks",
+    "isNewUser",
   ];
 
   const isValid = Object.keys(req.body).every((val) =>

@@ -98,6 +98,10 @@ const userSchema = new mongoose.Schema(
       linkedin: { type: String, default: "" },
       portfolio: { type: String, default: "" },
     },
+    isNewUser: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   { timestamps: true }
