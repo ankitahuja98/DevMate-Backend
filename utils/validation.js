@@ -13,6 +13,7 @@ function validateEditProfileData(req) {
     "experience",
     "lookingForTitle",
     "lookingForDesc",
+    "interests",
     "availability",
     "techStack",
     "projects",

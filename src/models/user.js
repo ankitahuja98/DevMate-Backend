@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: 4,
       maxlength: 50,
+      default: "",
     },
     email: {
       type: String,
@@ -21,6 +22,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       minlength: 1,
       maxlength: 50,
+      default: "",
       validate(value) {
         if (!validator.isEmail(value)) {
           throw new Error("Invalid email id: " + value);
@@ -30,8 +32,8 @@ const userSchema = new mongoose.Schema(
     age: {
       type: Number,
       required: false,
-      trim: true,
       min: 18,
+      default: null,
     },
     password: {
       type: String,
@@ -39,16 +41,18 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: 4,
       maxlength: 200,
+      default: "",
     },
 
     profilePhoto: { type: String, default: "" },
-    tagline: { type: String, maxLength: 100 },
-    bio: { type: String, maxLength: 500 },
-    location: { type: String },
+    tagline: { type: String, maxLength: 100, default: "" },
+    bio: { type: String, maxLength: 500, default: "" },
+    location: { type: String, default: "" },
 
-    currentRole: { type: String },
+    currentRole: { type: String, default: "" },
     experience: {
       type: Number,
+      default: null,
     },
     lookingForTitle: {
       type: String,
@@ -59,32 +63,40 @@ const userSchema = new mongoose.Schema(
         "team-member",
         "freelance-partner",
       ],
+      default: null,
     },
     lookingForDesc: {
       type: String,
       maxlength: 500,
+      default: "",
     },
     availability: {
       type: String,
       enum: ["full-time", "part-time", "weekends", "flexible"],
+      default: null,
     },
     techStack: {
       type: [String],
+      default: [],
     },
-    projects: [
-      {
-        title: String,
-        description: String,
-        techUsed: [String],
-        role: String,
-        githubUrl: String,
-        liveUrl: String,
-      },
-    ],
+    interests: { type: [String], default: [] },
+    projects: {
+      type: [
+        {
+          title: String,
+          description: String,
+          techUsed: [String],
+          role: String,
+          githubUrl: String,
+          liveUrl: String,
+        },
+      ],
+      default: [],
+    },
     socialLinks: {
-      github: String,
-      linkedin: String,
-      portfolio: String,
+      github: { type: String, default: "" },
+      linkedin: { type: String, default: "" },
+      portfolio: { type: String, default: "" },
     },
   },
 
