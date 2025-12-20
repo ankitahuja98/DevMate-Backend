@@ -80,7 +80,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     if (!validateEditProfileData(req)) {
       return res.status(400).json({
         success: false,
-        message: "Something wentttt wrong",
+        message: "Something went wrong",
       });
     }
 

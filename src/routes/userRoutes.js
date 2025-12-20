@@ -71,7 +71,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
 
-    // find the user with whome you connectied either you send the req or they send the req to you
+    // find the user with whom you connected either you send the req or they send the req to you
     const requests = await ConnectionRequest.find({
       $or: [
         { fromUserId: loggedInUserId }, // you send the req
