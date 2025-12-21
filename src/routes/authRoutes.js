@@ -10,14 +10,13 @@ authRouter.post("/auth/signup", async (req, res) => {
   //   #swagger.summary = "Register a new user";
   //   #swagger.description = "This endpoint registers a new user and returns a JWT token.";
   try {
-    const { name, email, age, password } = req.body;
+    const { name, email, password } = req.body;
 
     const passwordHash = await bcrypt.hash(password, 10);
 
     let user = new User({
       name,
       email,
-      age,
       password: passwordHash,
     });
     await user.save();

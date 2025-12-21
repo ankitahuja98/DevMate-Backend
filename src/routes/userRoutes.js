@@ -70,6 +70,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   //   #swagger.description = "This endpoint is used for get feed, all the other user profile";
   try {
     const loggedInUserId = req.user._id;
+    console.log("loggedInUserId", loggedInUserId);
 
     // find the user with whom you connected either you send the req or they send the req to you
     const requests = await ConnectionRequest.find({
@@ -78,7 +79,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
         {
           // they send the req to you
           toUserId: loggedInUserId,
-          status: { $ne: ["interested"] },
+          status: { $ne: "interested" },
         },
       ],
     }).select("fromUserId toUserId");
@@ -96,7 +97,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
 
     const feedUsers = await User.find({
       _id: { $nin: Array.from(excludedUserList) },
-    }).select("name age");
+    }).select("-password -email -__v -createdAt -updatedAt");
 
     res.status(200).json({ data: feedUsers });
   } catch (error) {
