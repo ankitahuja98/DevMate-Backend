@@ -42,8 +42,8 @@ userRouter.get("/user/matches", userAuth, async (req, res) => {
       status: "accepted",
       $or: [{ fromUserId: loggedInUserId }, { toUserId: loggedInUserId }],
     })
-      .populate("fromUserId", "name age")
-      .populate("toUserId", "name age");
+      .populate("fromUserId", "-password -email -__v -createdAt -updatedAt")
+      .populate("toUserId", "-password -email -__v -createdAt -updatedAt");
 
     const matches = connections.map((val) => {
       return val.fromUserId._id.toString() === loggedInUserId.toString()
