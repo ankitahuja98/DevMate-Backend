@@ -4,6 +4,7 @@
   "description": "DevMate is a full-stack MERN application that connects developers based on their tech interests — like Tinder, but for coders. Users can swipe to match with other developers, chat in real time, and collaborate on projects or discuss modern technologies.",
   "main": "index.js",
   "scripts": {
+    "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "swagger": "node swagger.js"

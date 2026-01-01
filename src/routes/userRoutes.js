@@ -70,8 +70,6 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   //   #swagger.description = "This endpoint is used for get feed, all the other user profile";
   try {
     const loggedInUserId = req.user._id;
-    console.log("loggedInUserId", loggedInUserId);
-
     // find the user with whom you connected either you send the req or they send the req to you
     const requests = await ConnectionRequest.find({
       $or: [
