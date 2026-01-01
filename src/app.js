@@ -19,7 +19,7 @@ app.use("/devmate.api.docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // CORS Handling
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://192.168.1.7:5173"], // Devmate frontend URL
+    origin: true, // allow same-origin
     credentials: true, // if sending cookies / tokens
   })
 );
