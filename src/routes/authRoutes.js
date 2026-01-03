@@ -3,6 +3,7 @@ const User = require("../models/user");
 
 const express = require("express");
 const authRouter = express.Router();
+const sendEmail = require("../../utils/sendEmail");
 
 //  User Signup
 authRouter.post("/auth/signup", async (req, res) => {
@@ -20,11 +21,16 @@ authRouter.post("/auth/signup", async (req, res) => {
       password: passwordHash,
     });
     await user.save();
+
+    const emailRes = await sendEmail.run();
+    console.log("emailRes", emailRes);
+
     return res.status(200).json({
       success: true,
       message: "User registered sucessfully",
     });
   } catch (error) {
+    console.log("error", error);
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
