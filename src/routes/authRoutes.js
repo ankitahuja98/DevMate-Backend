@@ -22,8 +22,7 @@ authRouter.post("/auth/signup", async (req, res) => {
     });
     await user.save();
 
-    const emailRes = await sendEmail.run();
-    console.log("emailRes", emailRes);
+    // const emailRes = await sendEmail.run();
 
     return res.status(200).json({
       success: true,

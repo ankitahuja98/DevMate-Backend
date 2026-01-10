@@ -27,6 +27,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
+    "razorpay": "^2.9.6",
     "swagger-autogen": "^2.23.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

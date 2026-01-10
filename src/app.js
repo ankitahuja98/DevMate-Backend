@@ -28,11 +28,13 @@ const authRouter = require("./routes/authRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const connectionReqRouter = require("./routes/connectionReqRoutes");
 const userRouter = require("./routes/userRoutes");
+const paymentRouter = require("./routes/paymentRoutes");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", connectionReqRouter);
 app.use("/", userRouter);
+app.use("/", paymentRouter);
 
 // Connect with DB and start the server
 connectDB()
