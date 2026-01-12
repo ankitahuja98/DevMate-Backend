@@ -57,12 +57,15 @@ paymentRouter.post("/test/payment/webhook", async (req, res) => {
   //   #swagger.description = "This endpoint is used to verify the payment either its captured or rejected";
   try {
     const webhookSignature = req.get("X-Razorpay-Signature");
+    console.log("webhookSignature", webhookSignature);
 
     const isWebhookValid = validateWebhookSignature(
       req.body.toString(),
       webhookSignature,
       process.env.Razorpay_Webhook_Secret
     );
+
+    console.log("isWebhookValid", isWebhookValid);
 
     if (!isWebhookValid) {
       return res.status(400).json({
@@ -84,11 +87,15 @@ paymentRouter.post("/test/payment/webhook", async (req, res) => {
     });
     if (!payment) return console.log("Payment not found for order:", orderId);
 
+    console.log("payment", payment);
+
     payment.status = "captured";
     await payment.save();
 
     const user = await User.findOne({ _id: payment.userId });
     if (!user) return console.log("User not found");
+    console.log("user", user);
+
     user.isPremium = true;
     await user.save();
   } catch (error) {
