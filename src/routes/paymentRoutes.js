@@ -60,7 +60,7 @@ paymentRouter.post("/test/payment/webhook", async (req, res) => {
     console.log("webhookSignature", webhookSignature);
 
     const isWebhookValid = validateWebhookSignature(
-      req.body.toString(),
+      JSON.stringify(req.body),
       webhookSignature,
       process.env.Razorpay_Webhook_Secret
     );
