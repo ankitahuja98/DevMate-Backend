@@ -54,7 +54,9 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
   //   #swagger.summary = "Get payment verification
   //   #swagger.description = "This endpoint is used to verify the payment either its captured or rejected";
   try {
-    const webhookSignature = req.header("X-Razorpay-Signature");
+    const webhookSignature = req.get("X-Razorpay-Signature");
+
+    console.log("webhookSignature", webhookSignature);
 
     const isWebhookValid = validateWebhookSignature(
       JSON.stringify(req.body),
@@ -69,19 +71,19 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
       });
     }
 
-    // todo
-    // 1. update my payment status in DB
-    // 2. update the user as premium
-
     const payment = await Payment.findOne({
       orderId: req.body.payload.payment.entity.order_id,
     });
+
+    console.log("payment", payment);
 
     payment.status = "captured";
     await payment.save();
 
     const user = await User.findOne({ _id: payment.userId });
     user.isPremium = true;
+    console.log("user", user);
+
     await user.save();
 
     return res.status(200).json({
