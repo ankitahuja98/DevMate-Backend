@@ -5,6 +5,7 @@ const Payment = require("../models/payment");
 const payment = require("../models/payment");
 const { validateWebhookSignature } = require("razorpay");
 const User = require("../models/user");
+const { v4: uuidv4 } = require("uuid");
 
 const paymentRouter = express.Router();
 
@@ -14,14 +15,15 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
   //   #swagger.summary = "Create Order
   //   #swagger.description = "This endpoint is used to create payment order in razorpay";
   try {
-    const { name } = req.user;
+    const { name, email } = req.user;
 
     const order = await razorpayinstance.orders.create({
       amount: 900,
       currency: "INR",
-      receipt: "receipt#1",
+      receipt: uuidv4(),
       notes: {
-        name: name,
+        name,
+        email,
       },
     });
 
@@ -56,10 +58,8 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
   try {
     const webhookSignature = req.get("X-Razorpay-Signature");
 
-    console.log("webhookSignature", webhookSignature);
-
     const isWebhookValid = validateWebhookSignature(
-      JSON.stringify(req.body),
+      req.body.toString(),
       webhookSignature,
       process.env.Razorpay_Webhook_Secret
     );
@@ -71,30 +71,28 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
       });
     }
 
+    // respond quickly to Razorpay
+    res.status(200).json({
+      success: true,
+      message: "Webhook received successfully",
+    });
+
+    if (req.body.event !== "payment.captured") return;
+
     const payment = await Payment.findOne({
       orderId: req.body.payload.payment.entity.order_id,
     });
-
-    console.log("payment", payment);
+    if (!payment) return console.log("Payment not found for order:", orderId);
 
     payment.status = "captured";
     await payment.save();
 
     const user = await User.findOne({ _id: payment.userId });
+    if (!user) return console.log("User not found");
     user.isPremium = true;
-    console.log("user", user);
-
     await user.save();
-
-    return res.status(200).json({
-      success: false,
-      message: "Webhook received successfully",
-    });
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error,
-    });
+    console.error("Webhook processing error:", error);
   }
 });
 
