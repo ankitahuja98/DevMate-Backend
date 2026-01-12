@@ -102,6 +102,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   { timestamps: true }
