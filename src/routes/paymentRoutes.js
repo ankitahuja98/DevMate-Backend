@@ -51,7 +51,7 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
 });
 
 // verify the payment its sucess or fail
-paymentRouter.post("/payment/webhook", async (req, res) => {
+paymentRouter.post("/test/payment/webhook", async (req, res) => {
   //   #swagger.tags = ["Payment"];
   //   #swagger.summary = "Get payment verification
   //   #swagger.description = "This endpoint is used to verify the payment either its captured or rejected";
