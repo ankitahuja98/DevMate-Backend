@@ -10,6 +10,9 @@ const paymentRouter = express.Router();
 
 // create an order
 paymentRouter.post("/payment/create", userAuth, async (req, res) => {
+  //   #swagger.tags = ["Payment"];
+  //   #swagger.summary = "Create Order
+  //   #swagger.description = "This endpoint is used to create payment order in razorpay";
   try {
     const { name } = req.user;
 
@@ -47,6 +50,9 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
 
 // verify the payment its sucess or fail
 paymentRouter.post("/payment/webhook", async (req, res) => {
+  //   #swagger.tags = ["Payment"];
+  //   #swagger.summary = "Get payment verification
+  //   #swagger.description = "This endpoint is used to verify the payment either its captured or rejected";
   try {
     const webhookSignature = req.header("X-Razorpay-Signature");
 

@@ -31,9 +31,6 @@
                 "email": {
                   "example": "any"
                 },
-                "age": {
-                  "example": "any"
-                },
                 "password": {
                   "example": "any"
                 }
