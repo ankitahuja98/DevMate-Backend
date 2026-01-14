@@ -24,6 +24,16 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  const safeBody = { ...req.body };
+
+  const sensitiveKeys = ["password", "confirmPassword", "newPassword"];
+  sensitiveKeys.forEach((key) => {
+    if (safeBody[key]) safeBody[key] = "***";
+  });
+  next();
+});
+
 const authRouter = require("./routes/authRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const connectionReqRouter = require("./routes/connectionReqRoutes");
