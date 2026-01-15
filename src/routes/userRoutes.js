@@ -95,6 +95,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
 
     const feedUsers = await User.find({
       _id: { $nin: Array.from(excludedUserList) },
+      isUserProfileCompleted: true,
     }).select("-password -email -__v -createdAt -updatedAt");
 
     res.status(200).json({ data: feedUsers });

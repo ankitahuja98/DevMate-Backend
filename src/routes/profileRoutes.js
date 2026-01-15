@@ -86,6 +86,10 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
     Object.keys(req.body).forEach((key) => (user[key] = req.body[key]));
 
+    if (!user.isUserProfileCompleted) {
+      user.isUserProfileCompleted = true;
+    }
+
     await user.save();
 
     return res.status(200).json({
@@ -96,7 +100,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     console.log(error);
     return res.status(500).json({
       success: false,
-      message: "Something went wrong",
+      message: "Something wentttt wrong",
     });
   }
 });
