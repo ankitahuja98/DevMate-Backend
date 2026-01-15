@@ -15,6 +15,31 @@ authRouter.post("/auth/signup", async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const existingUser = await User.findOne({ email }).select("+password");
+
+    // Case 1: Soft-deleted user → restore account
+    if (existingUser && existingUser.deletedAt) {
+      existingUser.deletedAt = null;
+      existingUser.name = name;
+      existingUser.password = passwordHash;
+
+      await existingUser.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Account restored successfully",
+      });
+    }
+
+    // Case 2: User exists and active → block signup
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is already registered",
+      });
+    }
+
+    // Case 3: Create new user
     let user = new User({
       name,
       email,
@@ -22,20 +47,12 @@ authRouter.post("/auth/signup", async (req, res) => {
     });
     await user.save();
 
-    // const emailRes = await sendEmail.run();
-
     return res.status(200).json({
       success: true,
       message: "User registered sucessfully",
     });
   } catch (error) {
     console.log("error", error);
-    if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: "Email id is already registered",
-      });
-    }
     return res.status(500).json({
       success: false,
       message: "Something went wrong",
@@ -57,6 +74,13 @@ authRouter.post("/auth/login", async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "Invalid Credentials",
+      });
+    }
+
+    if (user.deletedAt) {
+      return res.status(403).json({
+        success: false,
+        message: "This account has been deleted",
       });
     }
 

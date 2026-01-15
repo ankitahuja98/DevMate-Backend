@@ -105,4 +105,41 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   }
 });
 
+profileRouter.patch("/profile/delete", userAuth, async (req, res) => {
+  //   #swagger.tags = ["Profile"];
+  //   #swagger.summary = "Delete profile";
+  //   #swagger.description = "This endpoint is used for delete the user profile.";
+
+  try {
+    let user = req.user;
+
+    user = await User.findOne({ email: user.email });
+
+    const { password } = req.body;
+
+    const ispasswordValid = await user.ValidatePassword(password);
+
+    if (ispasswordValid) {
+      user.deletedAt = Date.now();
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "User deleted successfully!",
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid password",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
 module.exports = profileRouter;
