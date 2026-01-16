@@ -94,6 +94,7 @@ paymentRouter.post("/test/payment/webhook", async (req, res) => {
 
     const expiry = new Date();
     expiry.setMonth(expiry.getMonth() + 1);
+    console.log("expiry", expiry);
 
     user.isPremium = true;
     user.premiumExpiresAt = expiry;
@@ -108,7 +109,6 @@ paymentRouter.post("/payment/verify", userAuth, async (req, res) => {
   //   #swagger.summary = "Payment Verify
   //   #swagger.description = "This endpoint is used to verify the payment either its captured or rejected";
   try {
-    const user = req.user;
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
       req.body;
 
@@ -136,21 +136,11 @@ paymentRouter.post("/payment/verify", userAuth, async (req, res) => {
       });
     }
 
-    await Payment.findOneAndUpdate(
-      { orderId: razorpay_order_id },
-      {
-        paymentId: razorpay_payment_id,
-        status: "verified",
-      },
-      { runValidators: true }
-    );
-
     return res.status(200).json({
       success: true,
       message: "Payment verified. Premium will activate shortly.",
     });
   } catch (error) {
-    console.error("Payment verification error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

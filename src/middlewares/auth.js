@@ -21,16 +21,27 @@ const userAuth = async (req, res, next) => {
       "-password -__v -createdAt -updatedAt"
     );
 
-    req.user = user;
-
-    if (user) {
-      next();
-    } else {
+    if (!user) {
       return res.status(401).json({
         success: false,
         message: "Unauthorized user!",
       });
     }
+
+    // PREMIUM EXPIRY CHECK
+    if (
+      user.isPremium &&
+      user.premiumExpiresAt &&
+      user.premiumExpiresAt < new Date()
+    ) {
+      user.isPremium = false;
+      user.premiumExpiresAt = null;
+      await user.save();
+    }
+
+    req.user = user;
+
+    next();
   } catch (error) {
     return res.status(401).json({
       success: false,
