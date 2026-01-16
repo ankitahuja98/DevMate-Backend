@@ -6,6 +6,7 @@ const payment = require("../models/payment");
 const { validateWebhookSignature } = require("razorpay");
 const User = require("../models/user");
 const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
 
 const paymentRouter = express.Router();
 
@@ -53,8 +54,8 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
 // verify the payment its sucess or fail
 paymentRouter.post("/test/payment/webhook", async (req, res) => {
   //   #swagger.tags = ["Payment"];
-  //   #swagger.summary = "Get payment verification
-  //   #swagger.description = "This endpoint is used to verify the payment either its captured or rejected";
+  //   #swagger.summary = "Payment done via webhook
+  //   #swagger.description = "This endpoint is used to done the payment either its captured or rejected";
   try {
     const webhookSignature = req.get("X-Razorpay-Signature");
     console.log("webhookSignature", webhookSignature);
@@ -64,8 +65,6 @@ paymentRouter.post("/test/payment/webhook", async (req, res) => {
       webhookSignature,
       process.env.Razorpay_Webhook_Secret
     );
-
-    console.log("isWebhookValid", isWebhookValid);
 
     if (!isWebhookValid) {
       return res.status(400).json({
@@ -87,19 +86,75 @@ paymentRouter.post("/test/payment/webhook", async (req, res) => {
     });
     if (!payment) return console.log("Payment not found for order:", orderId);
 
-    console.log("payment", payment);
-
     payment.status = "captured";
     await payment.save();
 
     const user = await User.findOne({ _id: payment.userId });
     if (!user) return console.log("User not found");
-    console.log("user", user);
+
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + 1);
 
     user.isPremium = true;
+    user.premiumExpiresAt = expiry;
     await user.save();
   } catch (error) {
     console.error("Webhook processing error:", error);
+  }
+});
+
+paymentRouter.post("/payment/verify", userAuth, async (req, res) => {
+  //   #swagger.tags = ["Payment"];
+  //   #swagger.summary = "Payment Verify
+  //   #swagger.description = "This endpoint is used to verify the payment either its captured or rejected";
+  try {
+    const user = req.user;
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
+      req.body;
+
+    // Validate request body
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing Razorpay payment details",
+      });
+    }
+
+    // Generate expected signature
+    const body = `${razorpay_order_id}|${razorpay_payment_id}`;
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RazorpayKey_Secret)
+      .update(body)
+      .digest("hex");
+
+    // Verify signature
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment signature",
+      });
+    }
+
+    await Payment.findOneAndUpdate(
+      { orderId: razorpay_order_id },
+      {
+        paymentId: razorpay_payment_id,
+        status: "verified",
+      },
+      { runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment verified. Premium will activate shortly.",
+    });
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 });
 

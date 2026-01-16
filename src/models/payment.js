@@ -30,7 +30,14 @@ const payment = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["created", "attempted", "captured", "failed", "refunded"],
+      enum: [
+        "created",
+        "attempted",
+        "captured",
+        "failed",
+        "refunded",
+        "verified",
+      ],
       default: "created",
     },
     notes: {

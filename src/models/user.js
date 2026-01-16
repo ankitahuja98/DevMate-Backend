@@ -114,6 +114,10 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    premiumExpiresAt: {
+      type: Date,
+      default: null,
+    },
   },
 
   { timestamps: true }
