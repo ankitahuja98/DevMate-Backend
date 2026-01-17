@@ -4,6 +4,10 @@ require("dotenv").config();
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const app = express();
+const http = require("http");
+const server = http.createServer(app);
+const initializeSocket = require("../utils/socket");
+initializeSocket(server);
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger-output.json");
@@ -50,7 +54,7 @@ app.use("/", paymentRouter);
 connectDB()
   .then(() => {
     console.log("Database connected sucessfully...");
-    app.listen(8080, () => {
+    server.listen(8080, () => {
       console.log("Server started Successfully in 8080...");
     });
   })

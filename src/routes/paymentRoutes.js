@@ -94,7 +94,6 @@ paymentRouter.post("/test/payment/webhook", async (req, res) => {
 
     const expiry = new Date();
     expiry.setMonth(expiry.getMonth() + 1);
-    console.log("expiry", expiry);
 
     user.isPremium = true;
     user.premiumExpiresAt = expiry;
