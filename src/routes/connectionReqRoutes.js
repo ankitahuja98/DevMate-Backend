@@ -45,7 +45,7 @@ connectionReqRouter.post(
         message: "connection request send failed",
       });
     }
-  }
+  },
 );
 
 // Review Connection request
@@ -91,7 +91,7 @@ connectionReqRouter.post(
         message: "Connection request review failed",
       });
     }
-  }
+  },
 );
 
 module.exports = connectionReqRouter;
