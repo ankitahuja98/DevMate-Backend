@@ -11,21 +11,42 @@ chatRouter.get("/chat/:receiver", userAuth, async (req, res) => {
     const { receiver } = req.params;
     const sender = req.user._id;
 
-    let chat = await Chat.findOne({
-      participants: { $all: [sender, receiver] },
-    }).populate("messages.senderId", "name");
+    const limit = parseInt(req.query.size) || 25;
+    const page = parseInt(req.query.page) || 1;
 
-    if (!chat) {
-      chat = new Chat({
+    let chatMeta = await Chat.findOne(
+      {
+        participants: { $all: [sender, receiver] },
+      },
+      { messages: 1 },
+    );
+
+    if (!chatMeta) {
+      chatMeta = new Chat({
         participants: [sender, receiver],
         messages: [],
       });
 
-      await chat.save();
+      await chatMeta.save();
     }
 
+    const totalMessages = chatMeta.messages.length;
+    const end = totalMessages - (page - 1) * limit;
+    const start = Math.max(end - limit, 0);
+    const sliceSize = end - start;
+
+    const chat = await Chat.findOne(
+      {
+        participants: { $all: [sender, receiver] },
+      },
+      { messages: { $slice: [start, sliceSize] } },
+    ).populate("messages.senderId", "name");
+
     return res.status(200).json({
+      totalMessages,
       data: chat,
+      page,
+      limit,
     });
   } catch (error) {
     return res.status(500).json({
