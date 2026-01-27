@@ -2,6 +2,8 @@ const socket = require("socket.io");
 const crypto = require("crypto");
 const { Chat } = require("../src/models/chat");
 const mongoose = require("mongoose");
+const User = require("../src/models/user");
+const socketAuth = require("../src/middlewares/socketAuth");
 
 const getRoomId = (userId, targetUserId) => {
   return crypto
@@ -13,11 +15,23 @@ const getRoomId = (userId, targetUserId) => {
 const initializeSocket = (server) => {
   const io = socket(server, {
     cors: {
-      origin: true, // allow same-origin
+      origin: true,
+      credentials: true,
     },
   });
 
-  io.on("connection", (socket) => {
+  io.use(socketAuth);
+
+  io.on("connection", async (socket) => {
+    const userId = socket.user._id;
+
+    if (userId) {
+      await User.findByIdAndUpdate(userId, {
+        isOnline: true,
+        lastSeen: null,
+      });
+    }
+
     socket.on("joinChat", ({ userId, targetUserId }) => {
       const roomId = getRoomId(userId, targetUserId);
       socket.join(roomId);
@@ -54,7 +68,11 @@ const initializeSocket = (server) => {
       }
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
+      await User.findByIdAndUpdate(userId, {
+        isOnline: false,
+        lastSeen: new Date(),
+      });
       console.log("User disconnected");
     });
   });

@@ -73,7 +73,7 @@ chatRouter.get("/chatList", userAuth, async (req, res) => {
       .populate({
         path: "participants",
         match: { _id: { $ne: userId } }, // exclude myself
-        select: "name profilePhoto",
+        select: "name profilePhoto lastSeen isOnline",
       })
       .sort({ updateAt: -1 });
 
