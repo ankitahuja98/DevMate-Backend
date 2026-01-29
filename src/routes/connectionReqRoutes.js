@@ -8,7 +8,6 @@ const {
   validationConnectionReqSend,
   validationConnectionReqReview,
 } = require("../../utils/validation");
-const { Connection } = require("mongoose");
 
 // Send Connection request
 connectionReqRouter.post(
