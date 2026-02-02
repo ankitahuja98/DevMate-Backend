@@ -28,7 +28,11 @@ const socketAuth = async (socket, next) => {
       "-password -__v -createdAt -updatedAt",
     );
 
-    socket.user = user;
+    socket.user = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    };
 
     next();
   } catch (error) {

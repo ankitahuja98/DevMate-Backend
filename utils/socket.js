@@ -1,14 +1,13 @@
 const socket = require("socket.io");
 const crypto = require("crypto");
 const { Chat } = require("../src/models/chat");
-const mongoose = require("mongoose");
 const User = require("../src/models/user");
 const socketAuth = require("../src/middlewares/socketAuth");
 
 const getRoomId = (userId, targetUserId) => {
   return crypto
     .createHash("sha256")
-    .update([userId, targetUserId].sort().join("_"))
+    .update([userId.toString(), targetUserId.toString()].sort().join("_"))
     .digest("hex");
 };
 
@@ -23,6 +22,10 @@ const initializeSocket = (server) => {
   io.use(socketAuth);
 
   io.on("connection", async (socket) => {
+    if (!socket.user) {
+      return socket.disconnect();
+    }
+
     const userId = socket.user._id;
 
     if (userId) {
@@ -32,37 +35,45 @@ const initializeSocket = (server) => {
       });
     }
 
-    socket.on("joinChat", ({ userId, targetUserId }) => {
+    socket.on("joinChat", ({ targetUserId }) => {
       const roomId = getRoomId(userId, targetUserId);
       socket.join(roomId);
     });
 
-    socket.on("sendMessage", async ({ sender, receiver, message }) => {
+    socket.on("sendMessage", async ({ receiver, message, tempId }) => {
       // save my message into the db
       try {
-        const roomId = getRoomId(sender._id, receiver);
+        if (!receiver || !message) return;
 
-        let chat = await Chat.findOne({
-          participants: { $all: [sender._id, receiver] },
-        });
+        const roomId = getRoomId(userId, receiver);
 
-        if (!chat) {
-          chat = new Chat({
-            participants: [sender._id, receiver],
-            messages: [],
-          });
-        }
-        chat.messages.push({
-          senderId: sender._id,
+        const chat = await Chat.findOneAndUpdate(
+          { participants: { $all: [userId, receiver] } },
+          {
+            $push: { messages: { senderId: userId, message } },
+            $setOnInsert: { participants: [userId, receiver] },
+          },
+          {
+            new: true,
+            upsert: true,
+            projection: { messages: { $slice: -1 } },
+          },
+        );
+
+        const savedMessage = chat.messages[chat.messages.length - 1];
+
+        const messagePayload = {
+          _id: savedMessage._id,
+          tempId,
+          senderId: {
+            _id: userId,
+            name: socket.user?.name || "Unknown",
+          },
           message,
-        });
+          createdAt: savedMessage.createdAt || new Date(),
+        };
 
-        await chat.save();
-        io.to(roomId).emit("newMessageReceived", {
-          _id: chat.messages[chat.messages.length - 1]._id,
-          senderId: sender, // full object
-          message,
-        });
+        io.to(roomId).emit("newMessageReceived", messagePayload);
       } catch (error) {
         console.log("send msg error:", error);
       }
@@ -73,7 +84,6 @@ const initializeSocket = (server) => {
         isOnline: false,
         lastSeen: new Date(),
       });
-      console.log("User disconnected");
     });
   });
 };
