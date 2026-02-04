@@ -18,6 +18,11 @@ const messageSchema = new mongoose.Schema(
 
 const chatSchema = new mongoose.Schema(
   {
+    chatKey: {
+      type: String,
+      unique: true,
+      index: true,
+    },
     participants: [
       {
         type: mongoose.Schema.Types.ObjectId,
