@@ -3,6 +3,7 @@ const User = require("../models/user");
 
 const express = require("express");
 const { sendEmail } = require("../../utils/sendCustomMail");
+const otpGenerator = require("../../utils/otpGenerator");
 const authRouter = express.Router();
 
 //  User Signup
@@ -39,6 +40,8 @@ authRouter.post("/auth/signup", async (req, res) => {
       });
     }
 
+    await sendEmail(email, "signup", { otp: otpGenerator() });
+
     // Case 3: Create new user
     let user = new User({
       name,
@@ -67,8 +70,6 @@ authRouter.post("/auth/login", async (req, res) => {
   //   #swagger.description = "This endpoint logs in a user and returns a token in cookie.";
   try {
     const { email, password } = req.body;
-
-    await sendEmail(email, "login", { otp: 654321 });
 
     const user = await User.findOne({ email: email });
 
