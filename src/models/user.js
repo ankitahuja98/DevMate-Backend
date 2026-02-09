@@ -126,6 +126,27 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otpHash: {
+      type: String,
+      default: "",
+    },
+    otpExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    otpAttempts: {
+      type: Number,
+    },
+    otpResendCount: {
+      type: Number,
+    },
+    otpLastSentAt: {
+      type: Date,
+    },
   },
 
   { timestamps: true },
@@ -142,6 +163,12 @@ userSchema.methods.ValidatePassword = async function (password) {
   const ValidatePassword = await bcrypt.compare(password, this.password);
 
   return ValidatePassword;
+};
+
+userSchema.methods.validateOtp = async function (otp) {
+  const ValidateOtp = await bcrypt.compare(otp, this.otpHash);
+
+  return ValidateOtp;
 };
 
 const User = mongoose.model("User", userSchema);

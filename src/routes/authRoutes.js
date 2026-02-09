@@ -15,44 +15,115 @@ authRouter.post("/auth/signup", async (req, res) => {
     const { name, email, password } = req.body;
 
     const passwordHash = await bcrypt.hash(password, 10);
-
+    const otp = otpGenerator();
+    const otpHash = bcrypt.hashSync(otp.toString(), 10);
     const existingUser = await User.findOne({ email }).select("+password");
 
-    // Case 1: Soft-deleted user → restore account
-    if (existingUser && existingUser.deletedAt) {
-      existingUser.deletedAt = null;
-      existingUser.name = name;
-      existingUser.password = passwordHash;
-
-      await existingUser.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "Account restored successfully",
-      });
-    }
-
-    // Case 2: User exists and active → block signup
-    if (existingUser) {
+    // Case 1: User exists and active → block signup
+    if (existingUser && existingUser.isVerified) {
       return res.status(400).json({
         success: false,
         message: "Email is already registered",
       });
     }
 
-    await sendEmail(email, "signup", { otp: otpGenerator() });
+    // Case 2: User exists but NOT verified OR soft-deleted → override
+    if (existingUser) {
+      existingUser.name = name;
+      existingUser.password = passwordHash;
+      existingUser.deletedAt = null;
+      existingUser.isVerified = false;
+
+      existingUser.otpHash = otpHash;
+      existingUser.otpExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+      existingUser.otpAttempts = 0;
+      existingUser.otpResendCount = 0;
+      existingUser.otpLastSentAt = new Date();
+
+      await existingUser.save();
+
+      await sendEmail(email, "signup", { otp });
+
+      return res.status(200).json({
+        success: true,
+        message: "OTP sent successfully",
+      });
+    }
 
     // Case 3: Create new user
     let user = new User({
       name,
       email,
       password: passwordHash,
+      otpHash,
+      otpExpiresAt: new Date(Date.now() + 30 * 1000),
+      otpAttempts: 0,
+      otpResendCount: 0,
+      otpLastSentAt: new Date(),
     });
     await user.save();
+
+    await sendEmail(email, "signup", { otp: otp });
 
     return res.status(200).json({
       success: true,
       message: "User registered sucessfully",
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
+authRouter.post("/auth/verifyEmail", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Credentials not found",
+      });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (!user.otpExpiresAt || user.otpExpiresAt < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired",
+      });
+    }
+
+    let isOtpValid = await user.validateOtp(otp);
+
+    if (!isOtpValid) {
+      user.otpAttempts += 1;
+      await user.save();
+      return res.status(401).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    } else {
+      user.isVerified = true;
+      user.otpHash = null;
+      user.otpExpiresAt = null;
+      await user.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
     });
   } catch (error) {
     console.log("error", error);
@@ -77,6 +148,13 @@ authRouter.post("/auth/login", async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "Invalid Credentials",
+      });
+    }
+
+    if (!user.isVerified) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
     }
 
