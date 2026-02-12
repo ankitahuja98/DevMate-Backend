@@ -35,7 +35,7 @@ authRouter.post("/auth/signup", async (req, res) => {
       existingUser.isVerified = false;
 
       existingUser.otpHash = otpHash;
-      existingUser.otpExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+      existingUser.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
       existingUser.otpAttempts = 0;
       existingUser.otpResendCount = 0;
       existingUser.otpLastSentAt = new Date();
@@ -56,7 +56,7 @@ authRouter.post("/auth/signup", async (req, res) => {
       email,
       password: passwordHash,
       otpHash,
-      otpExpiresAt: new Date(Date.now() + 30 * 1000),
+      otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
       otpAttempts: 0,
       otpResendCount: 0,
       otpLastSentAt: new Date(),
@@ -85,7 +85,7 @@ authRouter.post("/auth/verifyEmail", async (req, res) => {
     if (!email || !otp) {
       return res.status(400).json({
         success: false,
-        message: "Credentials not found",
+        message: "Email and OTP are required",
       });
     }
 
@@ -101,7 +101,7 @@ authRouter.post("/auth/verifyEmail", async (req, res) => {
     if (!user.otpExpiresAt || user.otpExpiresAt < Date.now()) {
       return res.status(400).json({
         success: false,
-        message: "OTP expired",
+        message: "OTP has expired. Please click the Resend button.",
       });
     }
 
@@ -134,6 +134,67 @@ authRouter.post("/auth/verifyEmail", async (req, res) => {
   }
 });
 
+authRouter.post("/auth/resendOtp", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email are required",
+      });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const resend_Window = 15 * 60 * 1000;
+
+    if (
+      user.otpLastSentAt &&
+      Date.now() - user.otpLastSentAt.getTime() > resend_Window
+    ) {
+      user.otpResendCount = 0;
+    }
+
+    if (user.otpResendCount >= 5) {
+      return res.status(429).json({
+        success: false,
+        message: "Resend limit reached. Please try again after 15 minutes.",
+      });
+    }
+
+    const otp = otpGenerator();
+    const otpHash = bcrypt.hashSync(otp.toString(), 10);
+
+    user.otpHash = otpHash;
+    user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    user.otpLastSentAt = new Date();
+    user.otpAttempts = 0;
+    user.otpResendCount += 1;
+
+    await user.save();
+
+    await sendEmail(email, "signup", { otp });
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
 // user login
 authRouter.post("/auth/login", async (req, res) => {
   //   #swagger.tags = ["Auth"];
@@ -154,7 +215,7 @@ authRouter.post("/auth/login", async (req, res) => {
     if (!user.isVerified) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "Please verify your email",
       });
     }
 
