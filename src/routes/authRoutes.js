@@ -79,6 +79,9 @@ authRouter.post("/auth/signup", async (req, res) => {
 });
 
 authRouter.post("/auth/verifyEmail", async (req, res) => {
+  //   #swagger.tags = ["OTP"];
+  //   #swagger.summary = "verifyEmail via Otp";
+  //   #swagger.description = "This endpoint verifyEmail a email via otp.";
   try {
     const { email, otp } = req.body;
 
@@ -135,6 +138,9 @@ authRouter.post("/auth/verifyEmail", async (req, res) => {
 });
 
 authRouter.post("/auth/resendOtp", async (req, res) => {
+  //   #swagger.tags = ["OTP"];
+  //   #swagger.summary = "resendOtp";
+  //   #swagger.description = "This endpoint resend Otp for email verification";
   try {
     const { email } = req.body;
     if (!email) {

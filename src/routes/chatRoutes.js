@@ -7,7 +7,7 @@ const chatRouter = express.Router();
 
 chatRouter.get("/chat/:receiver", userAuth, async (req, res) => {
   //   #swagger.tags = ["Chat"];
-  //   #swagger.summary = "Get user chat
+  //   #swagger.summary = "Get user chat"
   //   #swagger.description = "This endpoint is used for get user chat";
   try {
     const { receiver } = req.params;
@@ -78,6 +78,9 @@ chatRouter.get("/chat/:receiver", userAuth, async (req, res) => {
 });
 
 chatRouter.get("/chatList", userAuth, async (req, res) => {
+  //   #swagger.tags = ["Chat"];
+  //   #swagger.summary = "Get Chat List"
+  //   #swagger.description = "This endpoint is used to get Chat List";
   try {
     const userId = req.user._id;
 
@@ -143,6 +146,9 @@ chatRouter.get("/chatList", userAuth, async (req, res) => {
 });
 
 chatRouter.post("/chatDelete/:targetUserId", userAuth, async (req, res) => {
+  //   #swagger.tags = ["Chat"];
+  //   #swagger.summary = "Delete Chat (Soft Delete)";
+  //   #swagger.description = "This endpoint is used to delete Chat";
   try {
     const userId = req.user._id;
     const { targetUserId } = req.params;
@@ -193,6 +199,9 @@ chatRouter.post(
   "/chat/markMessagesAsRead/:targetUserId",
   userAuth,
   async (req, res) => {
+    //   #swagger.tags = ["Chat"];
+    //   #swagger.summary = "Mark messages ss read"
+    //   #swagger.description = "This endpoint is used to Mark messages ss read";
     try {
       const userId = req.user._id;
       const { targetUserId } = req.params;
