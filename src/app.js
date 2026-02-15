@@ -44,6 +44,7 @@ const connectionReqRouter = require("./routes/connectionReqRoutes");
 const userRouter = require("./routes/userRoutes");
 const paymentRouter = require("./routes/paymentRoutes");
 const chatRouter = require("./routes/chatRoutes");
+const forgetPasswordRouter = require("./routes/forgetPasswordRoutes");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
@@ -51,6 +52,7 @@ app.use("/", connectionReqRouter);
 app.use("/", userRouter);
 app.use("/", paymentRouter);
 app.use("/", chatRouter);
+app.use("/", forgetPasswordRouter);
 
 // Connect with DB and start the server
 connectDB()
