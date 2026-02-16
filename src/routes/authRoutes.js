@@ -144,8 +144,6 @@ authRouter.post("/auth/resendOtp", async (req, res) => {
   try {
     const { email, purpose } = req.body;
 
-    console.log("purpose", purpose);
-
     if (!email) {
       return res.status(400).json({
         success: false,
