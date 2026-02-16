@@ -142,7 +142,10 @@ authRouter.post("/auth/resendOtp", async (req, res) => {
   //   #swagger.summary = "resendOtp";
   //   #swagger.description = "This endpoint resend Otp for email verification";
   try {
-    const { email } = req.body;
+    const { email, purpose } = req.body;
+
+    console.log("purpose", purpose);
+
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -186,7 +189,7 @@ authRouter.post("/auth/resendOtp", async (req, res) => {
 
     await user.save();
 
-    await sendEmail(email, "signup", { otp });
+    await sendEmail(email, purpose, { otp });
 
     return res.status(200).json({
       success: true,

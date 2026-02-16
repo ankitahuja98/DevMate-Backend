@@ -20,7 +20,7 @@ forgetPasswordRouter.post("/forgetPassword/verifyEmail", async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    if (!user) {
+    if (!user || !user.isVerified) {
       return res.status(404).json({
         success: false,
         message: "No user exists with this email address.",
