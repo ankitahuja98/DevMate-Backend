@@ -58,12 +58,15 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
   //   #swagger.description = "This endpoint is used to done the payment either its captured or rejected";
   try {
     const webhookSignature = req.get("X-Razorpay-Signature");
+    console.log("webhookSignature", webhookSignature);
 
     const isWebhookValid = validateWebhookSignature(
       JSON.stringify(req.body),
       webhookSignature,
       process.env.Razorpay_Webhook_Secret,
     );
+
+    console.log("isWebhookValid", isWebhookValid);
 
     if (!isWebhookValid) {
       return res.status(400).json({
