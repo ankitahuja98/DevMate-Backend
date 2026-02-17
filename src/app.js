@@ -9,16 +9,29 @@ const server = http.createServer(app);
 const initializeSocket = require("../utils/socket");
 initializeSocket(server);
 
+/* ---------------- ROUTERS ---------------- */
+const authRouter = require("./routes/authRoutes");
+const profileRouter = require("./routes/profileRoutes");
+const connectionReqRouter = require("./routes/connectionReqRoutes");
+const userRouter = require("./routes/userRoutes");
+const paymentRouter = require("./routes/paymentRoutes");
+const paymentWebhookRouter = require("./routes/paymentWebhookRoutes");
+const chatRouter = require("./routes/chatRoutes");
+const forgetPasswordRouter = require("./routes/forgetPasswordRoutes");
+
+/* ---------------- SWAGGER ---------------- */
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger-output.json");
 
+// WEBHOOK ROUTE FIRST (RAW BODY MUST NOT BE PARSED)
+app.use("/", paymentWebhookRouter);
+
+/* ---------------- GLOBAL MIDDLEWARES ---------------- */
 // express.json() is a middleware which "Take incoming JSON and convert it into a JS object so we can read req.body"
 app.use(express.json());
 
 // cookieParser is a middleware which helps "reads cookies from the request header and available in req.cookies"
 app.use(cookieParser());
-
-app.use("/devmate.api.docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // CORS Handling
 app.use(
@@ -28,6 +41,7 @@ app.use(
   }),
 );
 
+// mask sensitive fields (optional logging safety)
 app.use((req, res, next) => {
   const safeBody = { ...req.body };
 
@@ -38,14 +52,10 @@ app.use((req, res, next) => {
   next();
 });
 
-const authRouter = require("./routes/authRoutes");
-const profileRouter = require("./routes/profileRoutes");
-const connectionReqRouter = require("./routes/connectionReqRoutes");
-const userRouter = require("./routes/userRoutes");
-const paymentRouter = require("./routes/paymentRoutes");
-const chatRouter = require("./routes/chatRoutes");
-const forgetPasswordRouter = require("./routes/forgetPasswordRoutes");
+/* ---------------- SWAGGER ROUTES ---------------- */
+app.use("/devmate.api.docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+/* ---------------- APPLICATION ROUTES ---------------- */
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", connectionReqRouter);
@@ -54,6 +64,7 @@ app.use("/", paymentRouter);
 app.use("/", chatRouter);
 app.use("/", forgetPasswordRouter);
 
+/* ---------------- START SERVER ---------------- */
 // Connect with DB and start the server
 connectDB()
   .then(() => {
