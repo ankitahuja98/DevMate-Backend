@@ -15,6 +15,7 @@ const profileRouter = require("./routes/profileRoutes");
 const connectionReqRouter = require("./routes/connectionReqRoutes");
 const userRouter = require("./routes/userRoutes");
 const paymentRouter = require("./routes/paymentRoutes");
+const paymentWebhookRouter = require("./routes/paymentWebhookRoutes");
 const chatRouter = require("./routes/chatRoutes");
 const forgetPasswordRouter = require("./routes/forgetPasswordRoutes");
 
@@ -23,7 +24,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger-output.json");
 
 // WEBHOOK ROUTE FIRST (RAW BODY MUST NOT BE PARSED)
-app.use("/payment/webhook", paymentRouter);
+app.use("/", paymentWebhookRouter);
 
 /* ---------------- GLOBAL MIDDLEWARES ---------------- */
 // express.json() is a middleware which "Take incoming JSON and convert it into a JS object so we can read req.body"
