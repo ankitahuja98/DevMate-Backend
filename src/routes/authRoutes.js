@@ -20,7 +20,7 @@ authRouter.post("/auth/signup", async (req, res) => {
     const existingUser = await User.findOne({ email }).select("+password");
 
     // Case 1: User exists and active → block signup
-    if (existingUser && existingUser.isVerified) {
+    if (existingUser && existingUser.isVerified && !existingUser.deletedAt) {
       return res.status(400).json({
         success: false,
         message: "Email is already registered",

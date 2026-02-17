@@ -15,6 +15,7 @@ const routes = [
   "./src/routes/paymentRoutes.js",
   "./src/routes/profileRoutes.js",
   "./src/routes/userRoutes.js",
+  "./src/routes/forgetPasswordRoutes.js",
 ];
 
 swaggerAutogen(outputFile, routes, doc);

@@ -52,18 +52,17 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
 });
 
 // verify the payment its sucess or fail
-paymentRouter.post("/test/payment/webhook", async (req, res) => {
+paymentRouter.post("/payment/webhook", async (req, res) => {
   //   #swagger.tags = ["Payment"];
   //   #swagger.summary = "Payment done via webhook
   //   #swagger.description = "This endpoint is used to done the payment either its captured or rejected";
   try {
     const webhookSignature = req.get("X-Razorpay-Signature");
-    console.log("webhookSignature", webhookSignature);
 
     const isWebhookValid = validateWebhookSignature(
       JSON.stringify(req.body),
       webhookSignature,
-      process.env.Razorpay_Webhook_Secret
+      process.env.Razorpay_Webhook_Secret,
     );
 
     if (!isWebhookValid) {

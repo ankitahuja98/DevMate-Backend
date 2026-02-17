@@ -8,6 +8,9 @@ const forgetPasswordRouter = express.Router();
 
 // verify Email
 forgetPasswordRouter.post("/forgetPassword/verifyEmail", async (req, res) => {
+  //   #swagger.tags = ["forgetPassword"];
+  //   #swagger.summary = "forgetPassword email verification"
+  //   #swagger.description = "This endpoint is used to verify the user it exists or not";
   try {
     const { email } = req.body;
 
@@ -20,7 +23,7 @@ forgetPasswordRouter.post("/forgetPassword/verifyEmail", async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    if (!user || !user.isVerified) {
+    if (!user || !user.isVerified || user.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "No user exists with this email address.",
@@ -54,6 +57,9 @@ forgetPasswordRouter.post("/forgetPassword/verifyEmail", async (req, res) => {
 });
 
 forgetPasswordRouter.post("/forgetPassword/resetPassword", async (req, res) => {
+  //   #swagger.tags = ["forgetPassword"];
+  //   #swagger.summary = "forgetPassword set the password"
+  //   #swagger.description = "This endpoint is used to set the new password";
   try {
     const { email, newPassword } = req.body;
     if (!email || !newPassword) {
