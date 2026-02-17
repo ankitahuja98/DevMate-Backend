@@ -2,9 +2,7 @@ const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const razorpayinstance = require("../../utils/razorpay");
 const Payment = require("../models/payment");
-const payment = require("../models/payment");
-const { validateWebhookSignature } = require("razorpay");
-const User = require("../models/user");
+
 const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 
@@ -48,58 +46,6 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
       success: false,
       message: error,
     });
-  }
-});
-
-// verify the payment its sucess or fail
-paymentRouter.post("/test/payment/webhook", async (req, res) => {
-  //   #swagger.tags = ["Payment"];
-  //   #swagger.summary = "Payment done via webhook
-  //   #swagger.description = "This endpoint is used to done the payment either its captured or rejected";
-  try {
-    const webhookSignature = req.get("X-Razorpay-Signature");
-    console.log("webhookSignature", webhookSignature);
-
-    const isWebhookValid = validateWebhookSignature(
-      JSON.stringify(req.body),
-      webhookSignature,
-      process.env.Razorpay_Webhook_Secret,
-    );
-
-    if (!isWebhookValid) {
-      return res.status(400).json({
-        success: false,
-        message: "Webhook signature is invalid",
-      });
-    }
-
-    // respond quickly to Razorpay
-    res.status(200).json({
-      success: true,
-      message: "Webhook received successfully",
-    });
-
-    if (req.body.event !== "payment.captured") return;
-
-    const payment = await Payment.findOne({
-      orderId: req.body.payload.payment.entity.order_id,
-    });
-    if (!payment) return console.log("Payment not found for order:", orderId);
-
-    payment.status = "captured";
-    await payment.save();
-
-    const user = await User.findOne({ _id: payment.userId });
-    if (!user) return console.log("User not found");
-
-    const expiry = new Date();
-    expiry.setMonth(expiry.getMonth() + 1);
-
-    user.isPremium = true;
-    user.premiumExpiresAt = expiry;
-    await user.save();
-  } catch (error) {
-    console.error("Webhook processing error:", error);
   }
 });
 
