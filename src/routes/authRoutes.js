@@ -280,7 +280,11 @@ authRouter.post("/auth/logout", async (req, res) => {
   }
 });
 
+// google oauth login
 authRouter.get("/auth/googleLogin", async (req, res) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Google OAuth login'
+  // #swagger.description = 'This endpoint take the auth code from frontend and pass into the OAuth2client and verify the auth code and thereafter try to get the user info via access token'
   try {
     const { code } = req.query;
 

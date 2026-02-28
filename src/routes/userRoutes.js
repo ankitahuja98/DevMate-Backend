@@ -71,6 +71,12 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   //   #swagger.description = "This endpoint is used for get feed, all the other user profile";
   try {
     const loggedInUserId = req.user._id;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+
+    const skip = (page - 1) * limit;
+
     // find the user with whom you connected either you send the req or they send the req to you
     const requests = await ConnectionRequest.find({
       $or: [
@@ -98,9 +104,14 @@ userRouter.get("/feed", userAuth, async (req, res) => {
       _id: { $nin: Array.from(excludedUserList) },
       isUserProfileCompleted: true,
       deletedAt: null,
-    }).select("-password -email -__v -createdAt -updatedAt");
+    })
+      .select("-password -email -__v -createdAt -updatedAt")
+      .skip(skip)
+      .limit(limit);
 
-    res.status(200).json({ data: feedUsers });
+    res
+      .status(200)
+      .json({ data: feedUsers, page, hasMore: feedUsers.length === limit });
   } catch (error) {
     return res.status(500).json({
       success: false,
