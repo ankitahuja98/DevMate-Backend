@@ -37,11 +37,12 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.provider === "local";
+      },
       trim: true,
       minlength: 4,
       maxlength: 200,
-      default: "",
     },
 
     profilePhoto: { type: String, default: "" },
@@ -146,6 +147,11 @@ const userSchema = new mongoose.Schema(
     },
     otpLastSentAt: {
       type: Date,
+    },
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
   },
 

@@ -21,11 +21,13 @@
   "dependencies": {
     "@aws-sdk/client-ses": "^3.962.0",
     "@sendgrid/mail": "^8.1.6",
+    "axios": "^1.13.6",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "googleapis": "^171.4.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
     "razorpay": "^2.9.6",

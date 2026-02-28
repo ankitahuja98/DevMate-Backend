@@ -1,9 +1,12 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const { userAuth } = require("../middlewares/auth");
 
 const express = require("express");
 const { sendEmail } = require("../../utils/sendCustomMail");
 const otpGenerator = require("../../utils/otpGenerator");
+const { oauth2client } = require("../../utils/googleConfig");
+const { default: axios } = require("axios");
 const authRouter = express.Router();
 
 //  User Signup
@@ -222,7 +225,7 @@ authRouter.post("/auth/login", async (req, res) => {
     if (!user.isVerified) {
       return res.status(404).json({
         success: false,
-        message: "Please verify your email",
+        message: "Invalid Credentials",
       });
     }
 
@@ -270,6 +273,51 @@ authRouter.post("/auth/logout", async (req, res) => {
       message: "Logout successful",
     });
   } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
+authRouter.get("/auth/googleLogin", async (req, res) => {
+  try {
+    const { code } = req.query;
+
+    const googleRes = await oauth2client.getToken(code);
+    oauth2client.setCredentials(googleRes.tokens);
+
+    const userRes = await axios.get(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${googleRes.tokens.access_token}`,
+        },
+      },
+    );
+
+    const { email, name } = userRes.data;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        provider: "google",
+        isVerified: true,
+      });
+    }
+
+    const token = await user.getJWT();
+    res.cookie("token", token);
+
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+    });
+  } catch (error) {
+    console.log("error", error);
     return res.status(500).json({
       success: false,
       message: "Something went wrong",
