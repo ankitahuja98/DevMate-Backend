@@ -2,9 +2,10 @@ const swaggerAutogen = require("swagger-autogen")();
 
 const doc = {
   info: {
-    title: "DevMate - API",
+    title: "Devmate - API",
   },
-  host: "localhost:8080",
+  host: "devmate.co.in",
+  schemes: ["https"],
 };
 
 const outputFile = "./swagger-output.json";

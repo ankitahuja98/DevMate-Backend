@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const { faker } = require("@faker-js/faker");
 const User = require("../src/models/user");
 
-const numberOfUsers = 50;
+const numberOfUsers = 500;
 
 // Data Arrays
 const roles = [
@@ -106,7 +106,7 @@ function generateProjects() {
 async function seedUsers() {
   try {
     console.log("Creating demo users...");
-    await User.deleteMany({}); // delete all users (optional)
+    // await User.deleteMany({}); // delete all users (optional)
 
     const users = [];
 

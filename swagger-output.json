@@ -1,21 +1,17 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "DevMate - API",
+    "title": "Devmate - API",
     "version": "1.0.0",
     "description": ""
   },
-  "host": "localhost:8080",
+  "host": "devmate.co.in",
   "basePath": "/",
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["https"],
   "paths": {
     "/auth/signup": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Register a new user",
         "description": "This endpoint registers a new user and returns a JWT token.",
         "parameters": [
@@ -53,9 +49,7 @@
     },
     "/auth/verifyEmail": {
       "post": {
-        "tags": [
-          "OTP"
-        ],
+        "tags": ["OTP"],
         "summary": "verifyEmail via Otp",
         "description": "This endpoint verifyEmail a email via otp.",
         "parameters": [
@@ -96,9 +90,7 @@
     },
     "/auth/resendOtp": {
       "post": {
-        "tags": [
-          "OTP"
-        ],
+        "tags": ["OTP"],
         "summary": "resendOtp",
         "description": "This endpoint resend Otp for email verification",
         "parameters": [
@@ -139,9 +131,7 @@
     },
     "/auth/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Login a user",
         "description": "This endpoint logs in a user and returns a token in cookie.",
         "parameters": [
@@ -182,9 +172,7 @@
     },
     "/auth/logout": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "User logout",
         "description": "This endpoint logs out a user by clearing the cookie.",
         "responses": {
@@ -197,11 +185,31 @@
         }
       }
     },
+    "/auth/googleLogin": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Google OAuth login",
+        "description": "This endpoint take the auth code from frontend and pass into the OAuth2client and verify the auth code and thereafter try to get the user info via access token",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/chat/{receiver}": {
       "get": {
-        "tags": [
-          "Chat"
-        ],
+        "tags": ["Chat"],
         "summary": "Get user chat",
         "description": "This endpoint is used for get user chat",
         "parameters": [
@@ -237,9 +245,7 @@
     },
     "/chatList": {
       "get": {
-        "tags": [
-          "Chat"
-        ],
+        "tags": ["Chat"],
         "summary": "Get Chat List",
         "description": "This endpoint is used to get Chat List",
         "responses": {
@@ -257,9 +263,7 @@
     },
     "/chatDelete/{targetUserId}": {
       "post": {
-        "tags": [
-          "Chat"
-        ],
+        "tags": ["Chat"],
         "summary": "Delete Chat (Soft Delete)",
         "description": "This endpoint is used to delete Chat",
         "parameters": [
@@ -288,9 +292,7 @@
     },
     "/chat/markMessagesAsRead/{targetUserId}": {
       "post": {
-        "tags": [
-          "Chat"
-        ],
+        "tags": ["Chat"],
         "summary": "Mark messages ss read",
         "description": "This endpoint is used to Mark messages ss read",
         "parameters": [
@@ -316,9 +318,7 @@
     },
     "/connectionReq/send/{status}/{toUserId}": {
       "post": {
-        "tags": [
-          "Connection Request"
-        ],
+        "tags": ["Connection Request"],
         "summary": "send a connection request",
         "description": "This endpoint send a connection request either interested or ignored.",
         "parameters": [
@@ -353,9 +353,7 @@
     },
     "/connectionReq/review/{status}/{requestId}": {
       "post": {
-        "tags": [
-          "Connection Request"
-        ],
+        "tags": ["Connection Request"],
         "summary": "review a connection request",
         "description": "This endpoint review a connection request either accepted or rejected.",
         "parameters": [
@@ -390,9 +388,7 @@
     },
     "/payment/create": {
       "post": {
-        "tags": [
-          "Payment"
-        ],
+        "tags": ["Payment"],
         "summary": "Create Order",
         "description": "This endpoint is used to create payment order in razorpay",
         "responses": {
@@ -408,45 +404,9 @@
         }
       }
     },
-    "/payment/webhook": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "summary": "Payment done via webhook",
-        "description": "This endpoint is used to done the payment either its captured or rejected",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "event": {
-                  "example": "any"
-                },
-                "payload": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
     "/payment/verify": {
       "post": {
-        "tags": [
-          "Payment"
-        ],
+        "tags": ["Payment"],
         "summary": "Payment Verify",
         "description": "This endpoint is used to verify the payment either its captured or rejected",
         "parameters": [
@@ -487,9 +447,7 @@
     },
     "/profile/view": {
       "get": {
-        "tags": [
-          "Profile"
-        ],
+        "tags": ["Profile"],
         "summary": "Get user profile",
         "description": "This endpoint get a user profile data.",
         "responses": {
@@ -507,9 +465,7 @@
     },
     "/profile/forgetPassword": {
       "patch": {
-        "tags": [
-          "Profile"
-        ],
+        "tags": ["Profile"],
         "summary": "Forget Password",
         "description": "This endpoint is used for forget the password.",
         "parameters": [
@@ -544,9 +500,7 @@
     },
     "/profile/edit": {
       "patch": {
-        "tags": [
-          "Profile"
-        ],
+        "tags": ["Profile"],
         "summary": "Edit profile",
         "description": "This endpoint is used for edit the user data.",
         "responses": {
@@ -567,9 +521,7 @@
     },
     "/profile/delete": {
       "patch": {
-        "tags": [
-          "Profile"
-        ],
+        "tags": ["Profile"],
         "summary": "Delete profile",
         "description": "This endpoint is used for delete the user profile.",
         "parameters": [
@@ -601,9 +553,7 @@
     },
     "/user/requests": {
       "get": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "summary": "Get Connection Request",
         "description": "This endpoint is used for get connection request",
         "responses": {
@@ -621,9 +571,7 @@
     },
     "/user/matches": {
       "get": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "summary": "Get Matches",
         "description": "This endpoint is used for get matches",
         "responses": {
@@ -641,11 +589,21 @@
     },
     "/feed": {
       "get": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "summary": "Get Feed",
         "description": "This endpoint is used for get feed, all the other user profile",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -661,9 +619,7 @@
     },
     "/forgetPassword/verifyEmail": {
       "post": {
-        "tags": [
-          "forgetPassword"
-        ],
+        "tags": ["forgetPassword"],
         "summary": "forgetPassword email verification",
         "description": "This endpoint is used to verify the user it exists or not",
         "parameters": [
@@ -698,9 +654,7 @@
     },
     "/forgetPassword/resetPassword": {
       "post": {
-        "tags": [
-          "forgetPassword"
-        ],
+        "tags": ["forgetPassword"],
         "summary": "forgetPassword set the password",
         "description": "This endpoint is used to set the new password",
         "parameters": [
