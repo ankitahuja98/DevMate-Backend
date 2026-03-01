@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
@@ -72,10 +73,8 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
 
-    const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-
-    const skip = (page - 1) * limit;
+    const cursor = req.query.cursor || undefined;
 
     // find the user with whom you connected either you send the req or they send the req to you
     const requests = await ConnectionRequest.find({
@@ -100,18 +99,33 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     // Also exclude self
     excludedUserList.add(loggedInUserId.toString());
 
-    const feedUsers = await User.find({
+    // base query
+    const query = {
       _id: { $nin: Array.from(excludedUserList) },
       isUserProfileCompleted: true,
       deletedAt: null,
-    })
-      .select("-password -email -__v -createdAt -updatedAt")
-      .skip(skip)
-      .limit(limit);
+    };
 
-    res
-      .status(200)
-      .json({ data: feedUsers, page, hasMore: feedUsers.length === limit });
+    // cursor logic (IMPORTANT)
+    if (cursor) {
+      query._id.$lt = new mongoose.Types.ObjectId(cursor);
+    }
+
+    const feedUsers = await User.find(query)
+      .select("-password -email -__v -createdAt -updatedAt")
+      .sort({ _id: -1 })
+      .limit(limit + 1);
+
+    const hasMore = feedUsers.length > limit;
+
+    if (hasMore) {
+      feedUsers.pop();
+    }
+
+    const nextCursor =
+      feedUsers.length > 0 ? feedUsers[feedUsers.length - 1]._id : null;
+
+    res.status(200).json({ data: feedUsers, nextCursor, hasMore });
   } catch (error) {
     return res.status(500).json({
       success: false,

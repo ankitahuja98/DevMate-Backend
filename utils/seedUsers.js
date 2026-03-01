@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const { faker } = require("@faker-js/faker");
 const User = require("../src/models/user");
 
-const numberOfUsers = 1000;
+const numberOfUsers = 50;
 
 // Data Arrays
 const roles = [
@@ -106,6 +106,7 @@ function generateProjects() {
 async function seedUsers() {
   try {
     console.log("Creating demo users...");
+    await User.deleteMany({}); // delete all users (optional)
 
     const users = [];
 
@@ -180,7 +181,7 @@ async function seedUsers() {
   }
 }
 
-async function startSeed(params) {
+async function startSeed() {
   try {
     await connectDB();
     console.log("MongoDB connected for seeding");
