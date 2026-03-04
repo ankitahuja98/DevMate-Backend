@@ -310,6 +310,7 @@ authRouter.get("/auth/googleLogin", async (req, res) => {
         email,
         provider: "google",
         isVerified: true,
+        isNewUser: true,
       });
     }
 
