@@ -75,6 +75,11 @@ userRouter.get("/feed", userAuth, async (req, res) => {
 
     const limit = parseInt(req.query.limit) || 20;
     const cursor = req.query.cursor || undefined;
+    const search = (req.query.search || "").trim();
+    const role = (req.query.role || "").trim();
+    const skill = (req.query.skill || "").trim();
+    const experience = req.query.experience;
+    const availability = (req.query.availability || "").trim();
 
     // find the user with whom you connected either you send the req or they send the req to you
     const requests = await ConnectionRequest.find({
@@ -109,6 +114,22 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     // cursor logic (IMPORTANT)
     if (cursor) {
       query._id.$lt = new mongoose.Types.ObjectId(cursor);
+    }
+
+    // ── Search + advanced filters — applied server-side so a match on
+    // page 3/4 (not yet fetched by the client) is still found instead of
+    // only searching whatever's already loaded in the browser. ────────────
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(escaped, "i");
+      query.$or = [{ name: regex }, { currentRole: regex }, { techStack: regex }];
+    }
+
+    if (role) query.currentRole = role;
+    if (skill) query.techStack = skill;
+    if (availability) query.availability = availability;
+    if (experience !== undefined && experience !== "" && !Number.isNaN(Number(experience))) {
+      query.experience = Number(experience);
     }
 
     const feedUsers = await User.find(query)

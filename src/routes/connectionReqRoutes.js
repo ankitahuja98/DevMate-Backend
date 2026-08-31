@@ -8,6 +8,7 @@ const {
   validationConnectionReqSend,
   validationConnectionReqReview,
 } = require("../../utils/validation");
+const { createAndEmitNotification } = require("../../utils/notify");
 
 // Send Connection request
 connectionReqRouter.post(
@@ -33,6 +34,16 @@ connectionReqRouter.post(
       });
 
       await connectionReq.save();
+
+      if (status === "interested") {
+        createAndEmitNotification({
+          userId: toUserId,
+          type: "connection_request",
+          message: `${req.user.name} is interested in connecting with you`,
+          relatedUserId: fromUserId,
+          relatedId: connectionReq._id,
+        });
+      }
 
       return res.status(200).json({
         success: true,
@@ -79,6 +90,16 @@ connectionReqRouter.post(
       connectionReq.status = status;
 
       await connectionReq.save();
+
+      if (status === "accepted") {
+        createAndEmitNotification({
+          userId: connectionReq.fromUserId,
+          type: "connection_accepted",
+          message: `${req.user.name} accepted your connection request! You're now connected.`,
+          relatedUserId: loggedInUserId,
+          relatedId: connectionReq._id,
+        });
+      }
 
       return res.status(200).json({
         success: true,

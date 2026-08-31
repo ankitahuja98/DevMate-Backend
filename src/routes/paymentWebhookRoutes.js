@@ -2,6 +2,7 @@ const express = require("express");
 const { validateWebhookSignature } = require("razorpay");
 const Payment = require("../models/payment");
 const User = require("../models/user");
+const { createAndEmitNotification } = require("../../utils/notify");
 
 const PaymentWebhookRouter = express.Router();
 
@@ -64,6 +65,13 @@ PaymentWebhookRouter.post(
       user.isPremium = true;
       user.premiumExpiresAt = expiry;
       await user.save();
+
+      createAndEmitNotification({
+        userId: payment.userId,
+        type: "premium_purchase",
+        message: "🎉 Payment successful! You're now a Pro member.",
+        relatedId: payment._id,
+      });
     } catch (error) {
       console.error("Webhook processing error:", error);
     }

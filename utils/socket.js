@@ -15,6 +15,18 @@ const getChatKey = (userId, targetUserId) => {
   return [userId.toString(), targetUserId.toString()].sort().join("_");
 };
 
+// Holds the live Socket.IO server instance so other modules (routes) can
+// push events to a specific user without re-initializing the server.
+let ioInstance;
+
+// Emits `event` with `payload` to a specific user's personal room.
+// Safe to call even before the socket server is ready / if the user has no
+// active socket connection — it just won't reach anyone in that case.
+const emitToUser = (userId, event, payload) => {
+  if (!ioInstance || !userId) return;
+  ioInstance.to(userId.toString()).emit(event, payload);
+};
+
 const initializeSocket = (server) => {
   const io = socket(server, {
     cors: {
@@ -22,6 +34,8 @@ const initializeSocket = (server) => {
       credentials: true,
     },
   });
+
+  ioInstance = io;
 
   io.use(socketAuth);
 
@@ -37,6 +51,10 @@ const initializeSocket = (server) => {
         isOnline: true,
         lastSeen: null,
       });
+
+      // Personal room used to push notifications (and any other
+      // user-targeted event) regardless of which chat room is open.
+      socket.join(userId.toString());
     }
 
     socket.on("joinChat", ({ targetUserId }) => {
@@ -134,4 +152,4 @@ const initializeSocket = (server) => {
   });
 };
 
-module.exports = initializeSocket;
+module.exports = { initializeSocket, emitToUser };

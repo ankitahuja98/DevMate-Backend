@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
-const initializeSocket = require("../utils/socket");
+const { initializeSocket } = require("../utils/socket");
 initializeSocket(server);
 
 /* ---------------- ROUTERS ---------------- */
@@ -18,6 +18,7 @@ const paymentRouter = require("./routes/paymentRoutes");
 const paymentWebhookRouter = require("./routes/paymentWebhookRoutes");
 const chatRouter = require("./routes/chatRoutes");
 const forgetPasswordRouter = require("./routes/forgetPasswordRoutes");
+const notificationRouter = require("./routes/notificationRoutes");
 
 /* ---------------- SWAGGER ---------------- */
 const swaggerUi = require("swagger-ui-express");
@@ -63,6 +64,7 @@ app.use("/", userRouter);
 app.use("/", paymentRouter);
 app.use("/", chatRouter);
 app.use("/", forgetPasswordRouter);
+app.use("/", notificationRouter);
 
 /* ---------------- START SERVER ---------------- */
 // Connect with DB and start the server
